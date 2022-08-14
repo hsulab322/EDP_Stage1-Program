@@ -20,22 +20,7 @@ from psychopy.constants import (NOT_STARTED, STARTED, PLAYING, PAUSED,
                                 STOPPED, FINISHED, PRESSED, RELEASED, FOREVER)
 from psychopy.platform_specific.win32 import THREAD_PRIORITY_NORMAL
 
-
-
-########                                
-from pydrive.auth import GoogleAuth
-from pydrive.drive import GoogleDrive
-gauth = GoogleAuth()
-gauth.LoadCredentialsFile("mycreds.txt")
-if gauth.credentials is None:
-    gauth.LocalWebserverAuth()
-elif gauth.access_token_expired:
-    gauth.Refresh()
-else:
-    gauth.Authorize()
-gauth.SaveCredentialsFile("mycreds.txt")
-drive = GoogleDrive(gauth)
-########
+from driveapi import driveapi
 
 import numpy as np  # whole numpy lib is available, prepend 'np.'
 from numpy import (sin, cos, tan, log, log10, pi, average,
@@ -461,7 +446,7 @@ for i in trial_order_all: # trial 順序
         routineTimer.reset()
         # ------Prepare to start Routine "interval"-------
         continueRoutine = True
-        routineTimer.add(2.000000)
+        routineTimer.add(0.1000000) # 2s
         # update component parameters for each repeat
         # keep track of which components have finished
         intervalComponents = [cross]
@@ -655,7 +640,7 @@ for i in trial_order_all: # trial 順序
         routineTimer.reset()
         # ------Prepare to start Routine "interval"-------
         continueRoutine = True
-        routineTimer.add(2.000000)
+        routineTimer.add(0.100000) # 2s
         # update component parameters for each repeat
         # keep track of which components have finished
         intervalComponents = [cross]
@@ -733,7 +718,7 @@ for i in trial_order_all: # trial 順序
     target = all_point_data_list[i][0]
     step = target
     thisTrialChoice = []
-    for n in range(0,5):   ## tasks次數
+    for n in range(0,2):   ## 5 tasks次數
         currentChoice =''
         buttonA.image='./interface/buttonA.png'
         buttonB.image='./interface/buttonB.png'
@@ -1072,7 +1057,7 @@ for i in trial_order_all: # trial 順序
 
         # ------Prepare to start Routine "interval"-------
         continueRoutine = True
-        routineTimer.add(2.000000)
+        routineTimer.add(0.100000) # 2s
         # update component parameters for each repeat
         # keep track of which components have finished
         intervalComponents = [cross]
@@ -1220,7 +1205,7 @@ for i in trial_order_all: # trial 順序
 
     # ------Prepare to start Routine "interval"-------
     continueRoutine = True
-    routineTimer.add(5.00000)
+    routineTimer.add(0.100000) #5s
     # update component parameters for each repeat
     # keep track of which components have finished
     intervalComponents = [nextTrial]
@@ -1399,53 +1384,15 @@ win.flip()
 thisExp.saveAsWideText(filename+'.csv')
 thisExp.saveAsPickle(filename)
 
-#####pydrive 
+#####drive api
 
-folder_ID="1qirCr2AmbRImqLD9yLh-HF5Colvogk3a" # b082070008@g.ntu.edu.tw
-FILENAME = expInfo['participant']+"_"+expName+"_"+expInfo['date']
-
-file1 = drive.CreateFile({'title': FILENAME+'.csv',
-                          'parents':[{'kind': 'drive#fileLink',
-                                     'id': folder_ID}]})
-file1.SetContentFile(filename+'.csv') 
-file1.Upload()
-
-
-
-team_drive_id = '0AMIGWx53zKa9Uk9PVA'
-parent_folder_id = '19WEYBAISXG6yNuzVPe2RSApgiUa9DGiA'
-
-f = drive.CreateFile({
-    'title': FILENAME+'.csv',
-    'parents': [{
-        'kind': 'drive#fileLink',
-        'teamDriveId': team_drive_id,
-        'id': parent_folder_id
-    }]
-})
-f.SetContentFile(filename+'.csv') 
-f.Upload(param={'supportsTeamDrives': True})
-
+creds = driveapi.getCreds("driveapi/token.json")
+folderid = driveapi.create_folder(expInfo['participant'], creds)
+driveapi.upload_to_folder(folderid, filename+'.csv', creds)
 
 ##########################
 logging.flush()
-file2 = drive.CreateFile({'title': FILENAME+'.log',
-                          'parents':[{'kind': 'drive#fileLink',
-                                     'id': folder_ID}]})
-file2.SetContentFile(filename+'.log') 
-file2.Upload()
 
-
-f2 = drive.CreateFile({
-    'title': FILENAME+'.log',
-    'parents': [{
-        'kind': 'drive#fileLink',
-        'teamDriveId': team_drive_id,
-        'id': parent_folder_id
-    }]
-})
-f2.SetContentFile(filename+'.log') 
-f2.Upload(param={'supportsTeamDrives': True})
 
 
 # make sure everything is closed down
