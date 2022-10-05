@@ -1,0 +1,8 @@
+Bprime 1.3
+- 防止空按OK
+- validChoice
+- cancel orderedlist
+- add Subject column
+
+Bprime 1.4
+- consistency check on g and l
